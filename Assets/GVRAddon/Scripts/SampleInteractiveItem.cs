@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [RequireComponent (typeof(GVRInteractiveItem))]
-public class SampleInteractiveCube : MonoBehaviour {
+public class SampleInteractiveItem : MonoBehaviour {
 
     [SerializeField]
     private GVRInteractiveItem m_GvrInteractiveItem;
