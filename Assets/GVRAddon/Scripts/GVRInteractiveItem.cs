@@ -3,9 +3,9 @@ using UnityEngine;
 
 public class GVRInteractiveItem : MonoBehaviour, IGvrGazeResponder {
 
-    public Action OnPointerEnter;
-    public Action OnPointerExit;
-    public Action OnPointerClick;
+    public event Action OnPointerEnter;
+    public event Action OnPointerExit;
+    public event Action OnPointerClick;
 
     // Implement IGvrGazeResponder
     public void OnGazeEnter()
