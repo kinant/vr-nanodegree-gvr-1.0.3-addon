@@ -13,7 +13,8 @@ This is just a basic addon package that simplifies the workflow for a Google Car
 3. Drag a camera rig into your scene.
 4. To add an interactive item, add it to the scene and make sure it has a collider attached to it. Then just add the GVRInteractiveItem script component to it. 
 5. To handle interactions, create your custom script, and in it, create a variable to reference the GVRInteractiveItem component. You can do this however you want. Then, just register the appropiate methods to the actions on the GVRInteractiveItem component. Refer to example script below.
-6. Open the demo scene to look at an example. 
+6. Open the DemoScene scene to look at an example with a Game Object. 
+7. Open the DemoSceneUIButton scene to look at an example using a Button.
 
 #Example Interactive Item Script:
 
