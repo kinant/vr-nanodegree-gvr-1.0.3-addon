@@ -17,7 +17,8 @@ This is just a basic addon package that simplifies the workflow for a Google Car
 
 #Example Interactive Item Script:
 
-```using UnityEngine;
+```
+using UnityEngine;
 
 [RequireComponent (typeof(GVRInteractiveItem))]
 public class SampleInteractiveCube : MonoBehaviour {
@@ -50,4 +51,5 @@ public class SampleInteractiveCube : MonoBehaviour {
     private void HandleClick() {
         Debug.Log("Pointer has been clicked!");
     }
-}```
+}
+```
