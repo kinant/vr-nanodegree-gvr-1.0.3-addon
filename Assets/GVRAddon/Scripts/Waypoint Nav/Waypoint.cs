@@ -7,6 +7,8 @@ public class Waypoint : MonoBehaviour {
 	[SerializeField]
 	private GVRInteractiveItem m_GVRInteractiveItem;
 
+	public Waypoint[] neighbors;
+
 	// Color properties
 	public bool allowColorChanges = false;
 	public Color highlightColor;
@@ -19,7 +21,7 @@ public class Waypoint : MonoBehaviour {
 	public bool rotate = false;
 	public bool rotateOnHighlight = false;
 	public float rotationSpeed = 1.0f;
-	public Vector3 rotationAngle = Vector3.zero;
+	public Vector3 rotationAngle = new Vector3(45.0f, 45.0f, 45.0f);
 
 	private bool shouldRotate = false;
 	private bool shouldRotateHighlight = false;
@@ -36,10 +38,11 @@ public class Waypoint : MonoBehaviour {
 	private Vector3 currScale;
 
 	bool scalingStep = true;
-	bool shouldPulse;
-	bool shouldPulseOnHighlight;
+	bool shouldPulse = false;
+	bool shouldPulseOnHighlight = false;
 
 	private Transform m_Transform;
+	private WaypointNetworkNavigation _parentNetwork;
 
 	public void OnEnable(){
 		m_GVRInteractiveItem.OnPointerClick += OnReticleHit;
@@ -66,6 +69,12 @@ public class Waypoint : MonoBehaviour {
 		m_Transform = transform;
 		originalScale = m_Transform.localScale;
 		targetScale = new Vector3(originalScale.x * scaleByVector.x, originalScale.y * scaleByVector.y, originalScale.z * scaleByVector.z);
+
+		_parentNetwork = GetComponentInParent<WaypointNetworkNavigation> ();
+
+		if (_parentNetwork == null) {
+			Debug.LogError ("WAYPOINT ERROR: Waypoint is not a child of a Waypoint Network! Make sure parent has Waypoint Network component attached!");
+		}
 	}
 
 	void Update(){
@@ -76,7 +85,7 @@ public class Waypoint : MonoBehaviour {
 			m_Transform.Rotate (rotationAngle * rotationSpeed * Time.deltaTime);
 		}
 			
-		if (scalePulse && (!isHighlighted && !shouldPulseOnHighlight) || (shouldPulseOnHighlight && isHighlighted)) {
+		if (shouldPulse && (!isHighlighted && !shouldPulseOnHighlight) || (shouldPulseOnHighlight && isHighlighted)) {
 			currScale = m_Transform.localScale;
 
 			Vector3 newScale = Vector3.Lerp (currScale, targetScale, pulseSpeed * Time.deltaTime);
@@ -128,5 +137,27 @@ public class Waypoint : MonoBehaviour {
 			// Original color after 0.2 seconds.
 			Invoke ("OnReticleExit", 0.2f);
 		}
+
+		_parentNetwork.SetNewDestination (m_Transform.position, this);
 	}
+
+	public void EnableNeighbors(){
+		if (neighbors != null) {
+
+			Debug.Log ("Enabling neighbors!");
+
+			foreach (Waypoint w in neighbors) {
+				w.gameObject.SetActive (true);
+			}
+		}
+	}
+
+	public void DisableNeighbors(){
+		if (neighbors != null) {
+			foreach (Waypoint w in neighbors) {
+				w.gameObject.SetActive (false);
+			}
+		}
+	}
+
 }
