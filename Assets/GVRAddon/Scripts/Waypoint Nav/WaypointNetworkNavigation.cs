@@ -35,8 +35,9 @@ public class WaypointNetworkNavigation : MonoBehaviour {
 
 			if (Waypoints != null && Waypoints.Length > 0) {
 				if (Waypoints [0] != null) {
-					Waypoints [0].gameObject.SetActive (true);
-				} else {
+                    //Waypoints [0].gameObject.SetActive (true);
+                    Waypoints[0].EnableWaypoint();
+                } else {
 					Debug.LogError (_ErrorTag + "First waypoint is not set in array. Check the Waypoints array first element is set.");
 				}
 			} else {
@@ -63,7 +64,8 @@ public class WaypointNetworkNavigation : MonoBehaviour {
 
             if (currentWaypoint != null)
             {
-                currentWaypoint.gameObject.SetActive(false);
+                //currentWaypoint.gameObject.SetActive(false);
+                currentWaypoint.DisableWaypoint();
             }
 			return;
 		}
@@ -91,8 +93,9 @@ public class WaypointNetworkNavigation : MonoBehaviour {
 	void DisableAllWaypoints(){
 		if (Waypoints != null) {
 			foreach (Waypoint w in Waypoints) {
-				w.gameObject.SetActive (false);
-			}
+                // w.gameObject.SetActive (false);
+                w.DisableWaypoint();
+            }
 		}
 	}
 

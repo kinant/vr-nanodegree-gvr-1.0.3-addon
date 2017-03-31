@@ -9,11 +9,15 @@ public class Waypoint : MonoBehaviour {
 
 	public Waypoint[] neighbors;
 
+    // collider
+    private Collider m_Collider;
+
 	// Color properties
 	public bool allowColorChanges = false;
 	public Color highlightColor;
 	public Color triggerColor;
 
+    // Child properties
     private Transform m_ChildTransform;
 	private Renderer m_ChildRenderer;
 	private Color m_OriginalColor;
@@ -42,6 +46,12 @@ public class Waypoint : MonoBehaviour {
 	bool shouldPulse = false;
 	bool shouldPulseOnHighlight = false;
 
+    // audio and audio source properties
+    public bool playSounds = false;
+    public AudioClip soundOnTrigger;
+    public AudioClip soundOnHighlight;
+    private AudioSource m_AudioSource;
+
 	// private Transform m_ChildTransform;
 	private WaypointNetworkNavigation _parentNetwork;
 
@@ -60,6 +70,7 @@ public class Waypoint : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
+        m_Collider = GetComponent<Collider>();
         m_ChildTransform = gameObject.transform.GetChild(0);
 
         if (m_ChildTransform != null && m_ChildTransform.gameObject.GetComponent<Renderer> ()) {
@@ -78,6 +89,8 @@ public class Waypoint : MonoBehaviour {
 		if (_parentNetwork == null) {
 			Debug.LogError ("WAYPOINT ERROR: Waypoint is not a child of a Waypoint Network! Make sure parent has Waypoint Network component attached!");
 		}
+
+        m_AudioSource = GetComponent<AudioSource>();
 	}
 
 	void Update(){
@@ -142,26 +155,50 @@ public class Waypoint : MonoBehaviour {
 		}
 
 		_parentNetwork.SetNewDestination (m_ChildTransform.position, this);
+
+        // play sound
+        if (playSounds) {
+            Debug.Log("should play sound...");
+            PlaySound(soundOnTrigger);
+        }
 	}
 
 	public void EnableNeighbors(){
 		if (neighbors != null) {
 			foreach (Waypoint w in neighbors) {
-				w.gameObject.SetActive (true);
-			}
+                // w.gameObject.SetActive (true);
+                w.EnableWaypoint();
+            }
 		}
 	}
 
 	public void DisableNeighbors(){
 		if (neighbors != null) {
 			foreach (Waypoint w in neighbors) {
-				w.gameObject.SetActive (false);
-			}
+                // w.gameObject.SetActive (false);
+                w.DisableWaypoint();
+            }
 		}
 	}
 
-    public void DisableWaypoint() {
+    public void PlaySound(AudioClip clip) {
 
+        if (m_AudioSource != null && clip != null)
+        {
+            m_AudioSource.PlayOneShot(clip);
+        }
+        else {
+            Debug.LogError("WAYPOINT ERROR: Audio Source or AudioClip not found!");
+        }
     }
 
+    public void DisableWaypoint() {
+        m_ChildRenderer.enabled = false;
+        m_Collider.enabled = false;
+    }
+
+    public void EnableWaypoint() {
+        m_ChildRenderer.enabled = true;
+        m_Collider.enabled = true;
+    }
 }
