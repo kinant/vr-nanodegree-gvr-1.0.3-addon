@@ -55,6 +55,10 @@ public class Waypoint : MonoBehaviour {
 	// private Transform m_ChildTransform;
 	private WaypointNetworkNavigation _parentNetwork;
 
+    // particle system
+    public bool enableParticles = false;
+    private ParticleSystem m_ParticleSystem;
+
 	public void OnEnable(){
 		m_GVRInteractiveItem.OnPointerClick += OnReticleHit;
 		m_GVRInteractiveItem.OnPointerEnter += OnReticleEnter;
@@ -67,8 +71,18 @@ public class Waypoint : MonoBehaviour {
 		m_GVRInteractiveItem.OnPointerExit -= OnReticleExit;
 	}
 
-	// Use this for initialization
-	void Start () {
+    private void Awake()
+    {
+        m_ParticleSystem = GetComponent<ParticleSystem>();
+
+        if (m_ParticleSystem != null) {
+            m_ParticleSystem.Stop();
+        }
+
+    }
+
+    // Use this for initialization
+    void Start () {
 
         m_Collider = GetComponent<Collider>();
         m_ChildTransform = gameObject.transform.GetChild(0);
@@ -91,6 +105,10 @@ public class Waypoint : MonoBehaviour {
 		}
 
         m_AudioSource = GetComponent<AudioSource>();
+
+        if (m_ParticleSystem != null && enableParticles) {
+            m_ParticleSystem.Play();
+        }
 	}
 
 	void Update(){
@@ -195,10 +213,20 @@ public class Waypoint : MonoBehaviour {
     public void DisableWaypoint() {
         m_ChildRenderer.enabled = false;
         m_Collider.enabled = false;
+
+        if (m_ParticleSystem != null && m_ParticleSystem.isPlaying) {
+            m_ParticleSystem.Stop();
+        }
     }
 
     public void EnableWaypoint() {
         m_ChildRenderer.enabled = true;
         m_Collider.enabled = true;
+
+        if (m_ParticleSystem != null && enableParticles)
+        {
+            m_ParticleSystem.Play();
+        }
+
     }
 }
