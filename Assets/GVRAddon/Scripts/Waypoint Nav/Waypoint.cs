@@ -14,7 +14,8 @@ public class Waypoint : MonoBehaviour {
 	public Color highlightColor;
 	public Color triggerColor;
 
-	private Renderer m_Renderer;
+    private Transform m_ChildTransform;
+	private Renderer m_ChildRenderer;
 	private Color m_OriginalColor;
 
 	// Rotation properties
@@ -41,7 +42,7 @@ public class Waypoint : MonoBehaviour {
 	bool shouldPulse = false;
 	bool shouldPulseOnHighlight = false;
 
-	private Transform m_Transform;
+	// private Transform m_ChildTransform;
 	private WaypointNetworkNavigation _parentNetwork;
 
 	public void OnEnable(){
@@ -58,16 +59,18 @@ public class Waypoint : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		if (GetComponent<Renderer> ()) {
-			m_Renderer = GetComponent<Renderer> ();
-			m_OriginalColor = m_Renderer.material.color;
+
+        m_ChildTransform = gameObject.transform.GetChild(0);
+
+        if (m_ChildTransform != null && m_ChildTransform.gameObject.GetComponent<Renderer> ()) {
+            m_ChildRenderer = m_ChildTransform.gameObject.GetComponent<Renderer>();
+            m_OriginalColor = m_ChildRenderer.material.color;
 		}
 		if (rotate) {
 			shouldRotate = true;
 		}
 
-		m_Transform = transform;
-		originalScale = m_Transform.localScale;
+		originalScale = m_ChildTransform.localScale;
 		targetScale = new Vector3(originalScale.x * scaleByVector.x, originalScale.y * scaleByVector.y, originalScale.z * scaleByVector.z);
 
 		_parentNetwork = GetComponentInParent<WaypointNetworkNavigation> ();
@@ -82,27 +85,27 @@ public class Waypoint : MonoBehaviour {
 		shouldPulse = scalePulse;
 
 		if (shouldRotate && (!isHighlighted && !shouldRotateHighlight) || (shouldRotateHighlight && isHighlighted)) {
-			m_Transform.Rotate (rotationAngle * rotationSpeed * Time.deltaTime);
+			m_ChildTransform.Rotate (rotationAngle * rotationSpeed * Time.deltaTime);
 		}
 			
 		if (shouldPulse && (!isHighlighted && !shouldPulseOnHighlight) || (shouldPulseOnHighlight && isHighlighted)) {
-			currScale = m_Transform.localScale;
+			currScale = m_ChildTransform.localScale;
 
 			Vector3 newScale = Vector3.Lerp (currScale, targetScale, pulseSpeed * Time.deltaTime);
-			m_Transform.localScale = newScale;
+			m_ChildTransform.localScale = newScale;
 
 			if (scalingStep) {
-				if (m_Transform.localScale.x >= targetScale.x - 0.1f &&
-				    m_Transform.localScale.y >= targetScale.y - 0.1f &&
-				    m_Transform.localScale.z >= targetScale.z - 0.1f) {
+				if (m_ChildTransform.localScale.x >= targetScale.x - 0.1f &&
+				    m_ChildTransform.localScale.y >= targetScale.y - 0.1f &&
+				    m_ChildTransform.localScale.z >= targetScale.z - 0.1f) {
 
 					targetScale = originalScale;
 					scalingStep = false;
 				}
 			} else {
-				if (m_Transform.localScale.x <= targetScale.x + 0.1f &&
-					m_Transform.localScale.y <= targetScale.y + 0.1f &&
-					m_Transform.localScale.z <= targetScale.z + 0.1f) {
+				if (m_ChildTransform.localScale.x <= targetScale.x + 0.1f &&
+					m_ChildTransform.localScale.y <= targetScale.y + 0.1f &&
+					m_ChildTransform.localScale.z <= targetScale.z + 0.1f) {
 
 					targetScale = new Vector3(originalScale.x * scaleByVector.x, originalScale.y * scaleByVector.y, originalScale.z * scaleByVector.z);
 					scalingStep = true;
@@ -113,7 +116,7 @@ public class Waypoint : MonoBehaviour {
 
 	void OnReticleEnter(){
 		// Change the material color
-		if(allowColorChanges) m_Renderer.material.color = highlightColor;
+		if(allowColorChanges) m_ChildRenderer.material.color = highlightColor;
 
 		shouldRotateHighlight = rotateOnHighlight;
 		shouldPulseOnHighlight = scalePulseOnHighlight;
@@ -122,7 +125,7 @@ public class Waypoint : MonoBehaviour {
 
 	void OnReticleExit(){
 		// Change the material color
-		m_Renderer.material.color = m_OriginalColor;
+		m_ChildRenderer.material.color = m_OriginalColor;
 		shouldRotateHighlight = false;
 		shouldPulseOnHighlight = false;
 		isHighlighted = false;
@@ -131,21 +134,18 @@ public class Waypoint : MonoBehaviour {
 	void OnReticleHit(){
 		// Change the material color
 		if (allowColorChanges) {
-			m_Renderer.material.color = triggerColor;
+			m_ChildRenderer.material.color = triggerColor;
 
 			// Invoke OnReticleExit method to reset the waypoint material color to its
 			// Original color after 0.2 seconds.
 			Invoke ("OnReticleExit", 0.2f);
 		}
 
-		_parentNetwork.SetNewDestination (m_Transform.position, this);
+		_parentNetwork.SetNewDestination (m_ChildTransform.position, this);
 	}
 
 	public void EnableNeighbors(){
 		if (neighbors != null) {
-
-			Debug.Log ("Enabling neighbors!");
-
 			foreach (Waypoint w in neighbors) {
 				w.gameObject.SetActive (true);
 			}
@@ -159,5 +159,9 @@ public class Waypoint : MonoBehaviour {
 			}
 		}
 	}
+
+    public void DisableWaypoint() {
+
+    }
 
 }

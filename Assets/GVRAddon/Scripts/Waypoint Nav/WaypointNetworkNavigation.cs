@@ -60,7 +60,11 @@ public class WaypointNetworkNavigation : MonoBehaviour {
 		// move the camera to the destination
 		if(cameraPosition == cameraDestination){
 			isMoving = false;
-			currentWaypoint.gameObject.SetActive (false);
+
+            if (currentWaypoint != null)
+            {
+                currentWaypoint.gameObject.SetActive(false);
+            }
 			return;
 		}
 
@@ -81,7 +85,6 @@ public class WaypointNetworkNavigation : MonoBehaviour {
 				_camera.transform.position = cameraDestination;
 				cameraPosition = cameraDestination;
 			}
-
 		}
 	}
 
@@ -98,8 +101,7 @@ public class WaypointNetworkNavigation : MonoBehaviour {
 		if (isMoving)
 			return;
 
-		Debug.Log ("Setting new destination");
-		cameraDestination = newDest;
+        cameraDestination = newDest;
 
 		if (DisableWaypointNeighbors) {
 			if (currentWaypoint != null)
